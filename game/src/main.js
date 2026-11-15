@@ -373,4 +373,6 @@ if (AUTOSTART || DEMO) {
   }
 }
 
+// Exposed for automated QA harnesses; not used by the game itself
+window.__mirrorgrave = state;
 requestAnimationFrame(frame);
