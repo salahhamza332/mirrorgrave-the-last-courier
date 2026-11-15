@@ -117,7 +117,7 @@ function endRun(kind, reason) {
     ['PEAK HEAT', `${Math.round(state.peakDetection * 100)}%`],
     ['SCORE', String(state.score)],
   ];
-  if (isWin) stats.push(['TIME BONUS', `+${timeBonus}`], ['GHOST BONUS', ghost ? '+850' : `+${stealthBonus}`]);
+  if (isWin) stats.push(['TIME BONUS', `+${timeBonus}`], ['GHOST BONUS', `+${stealthBonus + (ghost ? 250 : 0)}`]);
   $('end-stats').innerHTML = stats.map(([k, v]) => `<div class="end-stat"><div class="v">${v}</div><div class="k">${k}</div></div>`).join('');
   $('end-best').textContent = newBest ? `NEW BEST — ${state.best}` : `BEST — ${state.best}`;
   showScreen('end');
@@ -360,6 +360,13 @@ if (AUTOSTART || DEMO) {
     state.world.relics.forEach(r => r.taken = true);
     state.peakDetection = 0.22; state.timeLeft = 214;
     endRun('victory');
+  } else if (DEMO === 'play') {
+    state.lanternOn = true;
+    state.world.relics[0].taken = true;
+    state.relicsCollected = 1; state.score = 400; updateRelicSlots();
+    state.player.x = 31.5; state.player.y = 13.2; snapCamera(state.player.x, state.player.y);
+    state.timeLeft = 214; state.detection = 0.31;
+    toast('MIRROR SIGIL — 2 RELICS REMAIN', 3);
   } else if (DEMO === 'lose') {
     state.peakDetection = 0.95;
     endRun('defeat', 'caught');
