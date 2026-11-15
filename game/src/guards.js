@@ -38,7 +38,7 @@ export function updateGuards(world, player, dt, events) {
 }
 
 // How visible is the player to this guard right now? Returns 0..1 contribution rate.
-export function guardSees(world, g, player, lanternOn, hidden, sprinting) {
+export function guardSees(world, g, player, lanternOn, hidden, sprinting, concealed = false) {
   const dx = player.x - g.x, dy = player.y - g.y;
   const d = Math.hypot(dx, dy);
   let range = 7.2;
@@ -46,6 +46,7 @@ export function guardSees(world, g, player, lanternOn, hidden, sprinting) {
   if (sprinting) range += 0.8;
   if (hidden) range -= 3.6;
   if (inFog(world, player.x, player.y)) range -= 2.2;
+  if (concealed) range -= 2.4;
   range = Math.max(1.6, range);
   if (d > range) return 0;
 
@@ -62,6 +63,7 @@ export function guardSees(world, g, player, lanternOn, hidden, sprinting) {
   if (sprinting) rate *= 1.3;
   if (hidden) rate *= 0.35;
   if (inFog(world, player.x, player.y)) rate *= 0.45;
+  if (concealed) rate *= 0.4;
   return rate;
 }
 

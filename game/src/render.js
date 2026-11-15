@@ -624,7 +624,7 @@ function drawDarkness(ctx, W, H, world, state, time) {
   const dark = getDarkCanvas(W, H);
   const dctx = dark.getContext('2d');
   dctx.clearRect(0, 0, W, H);
-  dctx.fillStyle = 'rgba(7, 5, 14, 0.52)';
+  dctx.fillStyle = 'rgba(7, 5, 14, 0.47)';
   dctx.fillRect(0, 0, W, H);
   dctx.globalCompositeOperation = 'destination-out';
 

@@ -143,7 +143,7 @@ function updateHUD(dt) {
   lChip.textContent = state.lanternOn ? 'LANTERN LIT' : 'LANTERN DARK';
   lChip.classList.toggle('on', state.lanternOn);
   const hChip = $('hide-state');
-  hChip.textContent = state.hidden ? 'HIDDEN' : 'IN THE OPEN';
+  hChip.textContent = state.concealed ? 'CONCEALED' : state.hidden ? 'HIDDEN' : 'IN THE OPEN';
   hChip.classList.toggle('hidden-chip', state.hidden);
   // Detection eye
   const eye = $('detection-eye');
@@ -283,9 +283,16 @@ function update(dt) {
   for (const b of world.bells) if (b.cooldown > 0) b.cooldown -= dt;
 
   // Guards & detection
+  // Concealment: hiding beside stone (graves, mausoleums, trunks) deepens the veil
+  const concealed = state.hidden && (
+    world.graves.some(g => Math.hypot(p.x - g.x, p.y - g.y) < 1.5) ||
+    world.obstacles.some(o => p.x > o.x - 1.2 && p.x < o.x + o.w + 1.2 && p.y > o.y - 1.2 && p.y < o.y + o.h + 1.2) ||
+    world.trees.some(t => Math.hypot(p.x - t.x, p.y - t.y) < 1.4)
+  );
+  state.concealed = concealed;
   updateGuards(world, p, dt, null);
   let rate = 0;
-  for (const g of world.guards) rate += guardSees(world, g, p, state.lanternOn, state.hidden, p.sprinting);
+  for (const g of world.guards) rate += guardSees(world, g, p, state.lanternOn, state.hidden, p.sprinting, concealed);
   if (rate > 0.02) {
     state.detection += rate * dt * 0.55;
     if (!state.wasOverHalf && state.detection >= 0.5) { state.timesSpotted++; state.wasOverHalf = true; sfx.alert(); }
@@ -344,8 +351,10 @@ showScreen('title');
 $('title-best').textContent = state.best > 0 ? `BEST DELIVERY — ${state.best}` : '';
 
 // Dev/screenshot aids — still real game logic, no fabricated renders
+if (params.get('lantern') === '1' || HREF.includes('lantern=1')) window.__forceLantern = true;
 if (AUTOSTART || DEMO) {
   startGame();
+  if (window.__forceLantern) state.lanternOn = true;
   if (DEMO === 'win') {
     state.relicsCollected = 3; state.score = 1200; updateRelicSlots();
     state.world.relics.forEach(r => r.taken = true);
